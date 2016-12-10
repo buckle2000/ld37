@@ -35,18 +35,21 @@ utils = {}
 with utils
   .white = ->
     lg.setColor 255,255,255
+  
+  .with_color = (color, func) ->
+    pr,pg,pb,pa = lg.getColor!
+    lg.setColor color
+    func!
+    lg.setColor pr,pg,pb,pa
 
   .new_debug_image = (width, height, fill_color={255, 255, 255}, text) ->
     local image_data
     with canvas = lg.newCanvas width, height
-      original_canvas = lg.getCanvas!
-      lg.setCanvas canvas
-      lg.setColor fill_color
-      lg.rectangle 'fill', 0,0, width, height
-      utils.white!
-      if text
-        lg.print text
-      lg.setCanvas original_canvas
+      canvas\renderTo ->
+        utils.with_color fill_color, ->
+          lg.rectangle 'fill', 0,0, width, height
+        if text
+          lg.print text
       image_data = canvas\newImageData!
     lg.newImage image_data
 

@@ -4,7 +4,6 @@ export Timer   = require("hump.timer")
 export Vec     = require("hump.vector")
 export lg      = love.graphics
 export U       = require("utils")
-export Z       = require("moses_min")
 table.seal _G
 -- no global variable declaration afterward!!!
 
