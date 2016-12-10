@@ -1,10 +1,13 @@
 math.round = (n) ->
   math.floor n + 0.5
 
-table.contains = (t, val) ->
-  for i,v in ipairs(t) do
-    return true if v == val
-  false
+math.in_range = (n, min, max) ->
+  if n < min
+    min
+  elseif n > max
+    max
+  else
+    n
 
 --- Seal a table
 table.seal = (t) ->
@@ -30,13 +33,22 @@ table.seal = (t) ->
 
 utils = {}
 with utils
-  .new_debug_image = (width, height, fill_color) ->
-    image_data = love.image.newImageData width, height
-    fill_color or= {255, 255, 255}
-    for x=0,width-1
-      for y=0,height-1
-        image_data\setPixel x, y, unpack(fill_color)
-    love.graphics.newImage image_data
+  .white = ->
+    lg.setColor 255,255,255
+
+  .new_debug_image = (width, height, fill_color={255, 255, 255}, text) ->
+    local image_data
+    with canvas = lg.newCanvas width, height
+      original_canvas = lg.getCanvas!
+      lg.setCanvas canvas
+      lg.setColor fill_color
+      lg.rectangle 'fill', 0,0, width, height
+      utils.white!
+      if text
+        lg.print text
+      lg.setCanvas original_canvas
+      image_data = canvas\newImageData!
+    lg.newImage image_data
 
   -- is point in polygon?
   .pnpoly = (vertices, x, y using nil) ->
@@ -50,10 +62,20 @@ with utils
       i += 1
     inside
 
-  .key_as_analog = (left,right,up,down) ->
-    dx, dy = 0, 0
-    if love.keyboard.isDown left  then dx -= 1
-    if love.keyboard.isDown right then dx += 1
-    if love.keyboard.isDown up    then dy -= 1
-    if love.keyboard.isDown down  then dy += 1
-    dx, dy
+  -- .key_as_analog = (left,right,up,down) ->
+  --   dx, dy = 0, 0
+  --   if love.keyboard.isDown left  then dx -= 1
+  --   if love.keyboard.isDown right then dx += 1
+  --   if love.keyboard.isDown up    then dy -= 1
+  --   if love.keyboard.isDown down  then dy += 1
+  --   dx, dy
+
+  .key_to_vec = {
+    Vec -1, 0
+    Vec 1, 0
+    Vec 0, -1
+    Vec 0, 1
+  }
+
+  .load_image = (name) ->
+    lg.newImage("assets/image/#{name}.png")

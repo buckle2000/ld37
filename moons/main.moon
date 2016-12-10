@@ -1,8 +1,10 @@
-export GS      = require("lib/hump.gamestate")
-export Signal  = require("lib/hump.signal")
-export Timer   = require("lib/hump.timer")
-export Vec     = require("lib/hump.vector")
+export GS      = require("hump.gamestate")
+export Signal  = require("hump.signal")
+export Timer   = require("hump.timer")
+export Vec     = require("hump.vector")
+export lg      = love.graphics
 export U       = require("utils")
+export Z       = require("moses_min")
 table.seal _G
 -- no global variable declaration afterward!!!
 
@@ -20,6 +22,4 @@ love.load = (arg) ->
   GS.registerEvents!
   first_state = default_state if #arg == 0 else arg[1]
   GS.switch require("states.#{first_state}")
-{a,b,_} = {1,2,3}
-1
-2
+  
