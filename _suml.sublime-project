@@ -1,0 +1,29 @@
+{
+	"build_systems":
+	[
+		{
+			"cmd":
+			[
+				"start",
+				"cmd",
+				"/c",
+				"run"
+			],
+			"file_regex": "^(?:.+):([0-9]+): (.*)$",
+			"name": "Custom_Love",
+			"selector":
+			[
+				"source.lua",
+				"source.moonscript"
+			],
+			"shell": true,
+			"working_dir": "$project_path"
+		}
+	],
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	]
+}
