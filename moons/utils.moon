@@ -9,6 +9,8 @@ math.in_range = (n, min, max) ->
   else
     n
 
+Vec.one = Vec 1,1
+
 --- Seal a table
 table.seal = (t) ->
   assert type(t) == "table"
@@ -22,20 +24,32 @@ table.seal = (t) ->
     error 'Try to temper with sealed table index `%s` with value `%s`'\format(k, v)
   t
 
--- return moon type
--- lua_type = type
--- export type = (value) -> -- class aware type
---   base_type = lua_type value
---   if base_type == "table"
---     cls = value.__class
---     return cls if cls
---   base_type
+table.contains = (t, v) ->
+  for vv in *t
+    return true if vv==v
+  false
+
+-- table.eq = (t1, t2) ->
+--   if #t1==#t2
+--     p
+--   else
+--     false
+
 
 utils = {}
 with utils
+  .type = (value) -> -- class aware type
+    base_type = type value
+    if base_type == "table"
+      cls = value.__class
+      return cls if cls
+    base_type
+    
+  -- set color to white
   .white = ->
     lg.setColor 255,255,255
   
+  -- set color temporarily to `color` and run `func`
   .with_color = (color, func) ->
     pr,pg,pb,pa = lg.getColor!
     lg.setColor color
@@ -43,6 +57,8 @@ with utils
     lg.setColor pr,pg,pb,pa
 
   .new_debug_image = (width, height, fill_color={255, 255, 255}, text) ->
+    assert width, "Please give width to create a debug image"
+    assert height, "Please give height to create a debug image"
     local image_data
     with canvas = lg.newCanvas width, height
       canvas\renderTo ->
@@ -73,12 +89,31 @@ with utils
   --   if love.keyboard.isDown down  then dy += 1
   --   dx, dy
 
-  .key_to_vec = {
-    Vec -1, 0
-    Vec 1, 0
-    Vec 0, -1
-    Vec 0, 1
-  }
-
+  image_cache = {}
   .load_image = (name) ->
-    lg.newImage("assets/image/#{name}.png")
+    local img
+    unless img = image_cache[name]
+      img = lg.newImage("assets/image/#{name}.png")
+      image_cache[name] = img
+    img
+
+
+  .load_level = (name) ->
+    level = love.filesystem.load "assets/level/#{name}.lua"
+    level = level!
+    level.id or= name
+    level.name or= "Unnamed"
+    assert #level == level.height, "Level #{name} has invalid height"
+    array2d = require "array2d"
+    level_2d = array2d Vec(level.width, level.height)
+    for y=1,level.height
+      row = level[y]
+      assert type(row) == "string", "Level #{name} row must be a string"
+      assert row\len! == level.width, "Level #{name} has row '#{row}' with invalid length"
+      for x=1,level.width
+        level_2d[x][y] = row\sub x,x
+    level_2d
+
+  .dir_is = (dir) -> type(dir)=='number' and 1<=dir and dir<=4
+  .dir_2vec = (dir) -> C.DIR2VEC[dir]
+  .dir_reverse = (dir) -> if dir<=2 then 3-dir else 7-dir

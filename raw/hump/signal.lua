@@ -39,6 +39,7 @@ function Registry:register(s, f)
 end
 
 function Registry:emit(s, ...)
+	print("Event:", s, ...)
 	for f in pairs(self[s]) do
 		f(...)
 	end

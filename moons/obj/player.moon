@@ -1,3 +1,7 @@
-class Player extends require "obj.basic"
-  new: (grid, pos) =>
-    super grid, pos
+Drawable = require "drawable"
+
+class Player extends Drawable
+  new: (pos, image) =>
+    super pos, image
+
+return Player
