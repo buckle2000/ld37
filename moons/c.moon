@@ -1,7 +1,8 @@
 with {}
-  .DEFAULT_STATE = "play"
+  .PATH_IMAGE = "assets/image/"
+  .DEFAULT_STATE = "welcome"
   -- MAP_SIZE: Vec 10, 10 -- custom map size
-  .CELL_SIZE = Vec 32,32
+  .CELL_SIZE = Vec 64, 64
   -- CELL_SIZE_HALF: Vec 16,16
   .LEFT  = 1
   .RIGHT = 2
@@ -13,3 +14,6 @@ with {}
     Vec 0, -1
     Vec 0, 1
   }
+  .WHITE = {149,223,255}
+  .BLUE = {43,191,255}
+  .DARKBLUE = {0,155,255}

@@ -21,6 +21,7 @@
 ]]
 
 local json = require("json")
+local Class = require("hump.class")
 
 local Frame = Class{
 	init = function (self, quad, duration)
@@ -100,14 +101,10 @@ local Animation = Class()
 --   will load 'path/to/image.png'
 --   and 'path/to/image.json' (must exist)
 function Animation:init(img_name)
-	do
-		local gcp = self.entity.graphics
-		assert(not gcp, "Already has graphics component.")
-		self.entity:add("graphics", love.graphics.newImage(CONST.PATH_IMAGE .. img_name .. ".png"))
-	end
+	self.image = love.graphics.newImage(C.PATH_IMAGE .. img_name .. ".png")
 
 	-- load config
-	local cfg = json.decode(love.filesystem.read(CONST.PATH_IMAGE .. img_name .. ".json"))
+	local cfg = json.decode(love.filesystem.read(C.PATH_IMAGE .. img_name .. ".json"))
 	local sw, sh = cfg.meta.size.w, cfg.meta.size.h
 	self.frames = {}
 	for i,frame in ipairs(cfg.frames) do
@@ -123,6 +120,10 @@ function Animation:init(img_name)
 	self._all_tag = Tag.all(#self.frames)
 	self:set_tag()
 	self.acc_t = 0
+end
+
+function Animation:draw()
+	love.graphics.draw(self.image, self:get_frame().quad)
 end
 
 function Animation:get_frame()

@@ -12,6 +12,7 @@ table.seal _G -- no global variable declaration afterward!!!
 love.load = (arg) ->
   math.randomseed os.time!
   lg.setDefaultFilter 'linear', 'nearest'
+  lg.setBackgroundColor unpack C.BLUE
 
   do
     -- if first argument is given (must be a state name)
@@ -22,13 +23,10 @@ love.load = (arg) ->
       arg = {unpack arg, 2}
     GS.registerEvents!
     love.draw = ->
-      lg.push!
-      lg.scale 2,2
       GS.draw!
-      lg.pop!
       -- TODO Post draw scaling
     first_state = C.DEFAULT_STATE if #arg == 0 else arg[1]
-    GS.switch require("states.play"), unpack(arg, 2)
+    GS.switch require("states.#{first_state}"), unpack(arg, 2)
 
 
 -- TODO global timer and signal?

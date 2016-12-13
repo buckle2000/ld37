@@ -101,8 +101,6 @@ with utils
   .load_level = (name) ->
     level = love.filesystem.load "assets/level/#{name}.lua"
     level = level!
-    level.id or= name
-    level.name or= "Unnamed"
     assert #level == level.height, "Level #{name} has invalid height"
     array2d = require "array2d"
     level_2d = array2d Vec(level.width, level.height)
@@ -112,8 +110,20 @@ with utils
       assert row\len! == level.width, "Level #{name} has row '#{row}' with invalid length"
       for x=1,level.width
         level_2d[x][y] = row\sub x,x
+    level_2d.id = level.id or name
+    if cond = level.win_condition
+      level_2d.win_condition = cond
+    else
+      error "Level #{name} has no win condition"
     level_2d
 
   .dir_is = (dir) -> type(dir)=='number' and 1<=dir and dir<=4
   .dir_2vec = (dir) -> C.DIR2VEC[dir]
   .dir_reverse = (dir) -> if dir<=2 then 3-dir else 7-dir
+
+  .play_sound = (sound_name) ->
+     source = love.audio.newSource "assets/sound/#{sound_name}.wav", 'static'
+     source\play!
+
+  .goto_state = (next_name, ...) ->
+    GS.switch (require "states.transition"), (require "states.#{next_name}"), ...

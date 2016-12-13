@@ -1,6 +1,7 @@
 Array2d = require "array2d"
-Cell = require "obj.cell"
-Fish = require "obj.fish"
+Cell    = require "obj.cell"
+Fish    = require "obj.fish"
+Player  = require "obj.player"
 
 --- The water tank
 --    Events:
@@ -46,9 +47,23 @@ class Tank
     sig = @gs.signal
     tmr = @gs.timer
     sig\register "keypressed", @\keypressed
-    sig\register "player_move", @\step
-    -- sig\register "task_inc", @\task_inc
-    -- sig\register "task_dec", @\task_dec
+    sig\register "player_move", ->
+      @task_inc!
+      tmr\after 0.1, ->
+        @step!
+        @task_dec!
+    sig\register "player_stuck", (pos, dir using nil) ->
+      dirvec = U.dir_2vec(dir)\permul(C.CELL_SIZE) * 0.15
+      @task_inc!
+      player = @g_pool\get(pos)
+      x, y = player.x, player.y
+      tmr\tween 0.05, player, {x:dirvec.x+x, y:dirvec.y+y}
+      tmr\after 0.05, ->
+        tmr\tween 0.05, player, {:x, :y}
+      tmr\after 0.1, ->
+        @task_dec!
+    sig\register "task_inc", @\task_inc
+    sig\register "task_dec", @\task_dec
     sig\register "task_idle", @\refresh_cells
     sig\register "cell_move", (origin, dir, dest) ->
       @task_inc!
@@ -69,6 +84,8 @@ class Tank
       @g_pool\set dest, nil
       tmr\tween 0.2, fish_active, {:x,:y}, 'in-out-quad'
       tmr\after 0.2, @\task_dec
+    sig\register "cell_zip", -> U.play_sound("zip")
+    sig\register "cell_unzip", -> U.play_sound("unzip")
     sig\register "cell_unzip", (origin, dir, dest) ->
       @task_inc!
       x, y = @screen_coords origin\unpack!
@@ -80,6 +97,19 @@ class Tank
       table.insert @g_out, fish_active
       tmr\tween 0.2, fish_active, {x:dstx,y:dsty}, 'in-out-quad'
       tmr\after 0.2, @\task_dec
+    sig\register "player_move", (_,_,dest) ->
+      if @gs.level.win_condition dest\unpack!
+        tmr\after 0.2, @\refresh_cells
+        tmr\script (wait) ->
+          @task_inc!
+          @game_x = 2
+          wait 0.1
+          U.play_sound "win"
+          wait 4.3
+          U.goto_state "play", @gs.level_name+1
+
+
+    -- sig\register "player_move", -> U.play_sound("move")
 
 
   -- reference-count Tasking
@@ -119,6 +149,19 @@ class Tank
 
   -- Move a cell
   cell_move: (origin, direction using nil) =>
+    can_move = @cell_move_h origin, direction
+    if can_move
+      true
+    else
+      @cell_move_h origin, direction, 2
+    --   dirvec = U.dir_2vec direction
+    --   o2 = origin + dirvec
+    --   if cell = @grid\get o2
+    --     dest = origin + dirvec
+    --     if dest_cell = @grid\get dest
+    -- return false
+
+  cell_move_h: (origin, direction, dozip=0 using nil) =>
     cell = @grid\get origin
     assert cell, "There is no cell at #{origin}"
     dest = origin + U.dir_2vec direction
@@ -126,30 +169,33 @@ class Tank
               Cell.movable_cell cell -- fish movable
       if dest_cell = @grid\get dest
         -- one fish at dest
-        if new_cell = Cell.zip dest_cell, cell, direction
-          -- zipable
-          @grid\set origin, false
-          @grid\set dest, new_cell
-          @gs.signal\emit "cell_zip", origin, direction, dest
-          true
-        elseif @cell_move dest, direction
+        if dozip>0
+          if new_cell = Cell.zip dest_cell, cell, direction
+              -- zipable
+            @grid\set origin, false
+            @grid\set dest, new_cell
+            @gs.signal\emit "cell_zip", origin, direction, dest
+            return true
+        -- else
+        --   return false
+        if @cell_move_h dest, direction, dozip-1
           -- move a bunch of fish
           @grid\set origin, false
           @grid\set dest, cell
           @gs.signal\emit "cell_move", origin, direction, dest
-          true
+          return true
         else
           @gs.signal\emit "cell_stuck", origin, direction
-          false
+          return false
       else
         -- there is no fish at dest, simple move there
         @grid\set origin, false
         @grid\set dest, cell
         @gs.signal\emit "cell_move", origin, direction, dest
-        true
+        return true
     else
       @gs.signal\emit "cell_stuck", origin, direction
-      false
+      return false
 
 
   step: =>
@@ -172,18 +218,31 @@ class Tank
   screen_coords: (cell_x, cell_y) =>
     (cell_x-0.5)*C.CELL_SIZE.x, (cell_y-0.5)*C.CELL_SIZE.y
 
-  draw: =>
-    -- @draw_player!
+  draw: (using nil) =>
+    w, h = (@grid.size\permul C.CELL_SIZE)\unpack!
+    U.with_color C.DARKBLUE, ->
+      lg.setLineWidth 10
+      lg.line 0,0,0,h,w,h,w,0
+    @grid\foreach (x, y, cell using nil) ->
+      local color
+      if @gs.level.win_condition x, y
+        color = C.WHITE
+      else
+        color = C.BLUE
+      x, y = @screen_coords x-0.5, y-0.5
+      U.with_color color, ->
+        lg.rectangle 'fill', x, y, C.CELL_SIZE\unpack!
     @draw_cells!
-
-  draw_player: =>
-    lg.draw U.load_image("player"), @screen_coords(@player\unpack!)
 
   refresh_cells: =>
     @g_out = {}
     @g_pool = @grid\clone (x, y, cell) ->
       if cell
-        Fish cell, @screen_coords(x, y)
+        if cell.fish == '^'
+          with player = Player @screen_coords(x, y)
+            @gs.signal\register "update", player\update
+        else
+          Fish cell, @screen_coords(x, y)
       else
         nil
 

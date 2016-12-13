@@ -1,0 +1,44 @@
+{ "frames": [
+   {
+    "filename": "player# 0.ase",
+    "frame": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 700
+   },
+   {
+    "filename": "player# 1.ase",
+    "frame": { "x": 64, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   {
+    "filename": "player# 2.ase",
+    "frame": { "x": 128, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 700
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.1.7",
+  "image": "C:\\buckle2000\\project\\major\\ld37\\assets_image\\player#.png",
+  "format": "RGBA8888",
+  "size": { "w": 192, "h": 64 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "default", "from": 0, "to": 2, "direction": "pingpong" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ]
+ }
+}

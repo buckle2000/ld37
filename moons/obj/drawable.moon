@@ -1,10 +1,24 @@
 class Drawable
-  new: (pos, image) =>
-    if pos == nil
-      pos = vec!
-    @pos = pos
-    @image = love.graphics.newImage image
+  new: (x=0, y=0, r=0, color) =>
+    @x = x
+    @y = y
+    @r = r
+    @color = color
+
+  add_image: (image) =>
+    @image = image
+    
   draw: =>
-    love.graphics.draw @image, @pos.x, @pos.y
+    lg.push!
+    lg.translate @x, @y
+    lg.rotate @r
+    if @color
+      U.with_color @color, @\draw_internal
+    else
+      @draw_internal!
+    lg.pop!
+
+  draw_internal: =>
+    lg.draw @image
 
 return Drawable

@@ -12,11 +12,11 @@ with {}
   .fishes = {
     -- ' ': air
     '^': -- player
-      o: U.load_image('player')
+      o: 'player'
     '.': -- normal fish
       o: U.load_image('fish_normal')    -- []
-      h: U.load_image('fish_normal_h')  -- ==
-      v: U.load_image('fish_normal_v')  -- ||
+      -- h: U.load_image('fish_normal_h')  -- ==
+      -- v: U.load_image('fish_normal_v')  -- ||
     '#': -- block fish
       o: U.load_image('fish_block')
     'X': -- barrier

@@ -1,4 +1,8 @@
 
+## Used Tools
+- Aseprite for graphics
+- ChipTone for sound effects
+
 ## Used libraries
 - aseprite - Aseprite loader, by @buckle2000
 - hump - http://hump.readthedocs.io/en/latest/
