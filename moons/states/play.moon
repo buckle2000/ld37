@@ -21,7 +21,7 @@ with {}
 				wait 0.2
 				@signal\emit "task_dec"
 		
-	.enter = (previous, level_name=1) => -- runs every time the state is entered
+	.enter = (previous, level_name=3) => -- runs every time the state is entered
 		if level_name == 5
 			GS.switch require("states.end")
 			return

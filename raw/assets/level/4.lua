@@ -1,20 +1,17 @@
 return {
-	width = 9,
-	height = 10,
+	width = 6,
+	height = 7,
 
-	'. ..X....',
-	'# #.# ..#',
-	'...X#....',
-	'.#..X.#. ',
-	'... #.. .',
-	'....X....',
-	'... #..#.',
-	'X.. #....',
-	'...X#....',
-	'    ^    ',
+	'#X...X',
+	'#..X.#',
+	'X...X#',
+	' #...X',
+	'#...# ',
+	'...# .',
+	' ^..X.',
 
 	win_condition = function (x, y)
-		if y<=3 and x<5 then
+		if y<=2 then
 			return true
 		end
 		return false

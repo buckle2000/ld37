@@ -1,6 +1,6 @@
 with {}
   .PATH_IMAGE = "assets/image/"
-  .DEFAULT_STATE = "welcome"
+  .DEFAULT_STATE = if DEBUG then "play" else "welcome"
   -- MAP_SIZE: Vec 10, 10 -- custom map size
   .CELL_SIZE = Vec 64, 64
   -- CELL_SIZE_HALF: Vec 16,16

@@ -1,4 +1,4 @@
-DEBUG = false
+export DEBUG = true
 unless DEBUG
   print = ->
 
